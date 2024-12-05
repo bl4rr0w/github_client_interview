@@ -19,7 +19,10 @@ module Github
         # It returns the response from the Github API
         # It appends the path in the url argument to the repo_url instance variable
         # to form the full URL
-            HTTParty.get("#{@repo_url}#{url}", headers: headers)
+            response = HTTParty.get("#{@repo_url}#{url}", headers: headers)
+
+            raise "Error: Unable to fetch data (HTTP #{response.code})" if response.code != 200
+            response
         end
 
         private

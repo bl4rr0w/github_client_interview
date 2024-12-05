@@ -19,19 +19,32 @@ module Github
             # It returns the response from the Github API.
 
             state = open ? 'open' : 'closed'
+            all_issues = []
+            page = 1
              # Return a list of issues from the response, with each line showing the issue's title, whether it is open or closed,
             # and the date the issue was closed if it is closed, or the date the issue was created if it is open.
             # the issues are sorted by the date they were closed or created, from newest to oldest.
-            
-            response = @client.get("/issues?state=#{state}")
-            issues = JSON.parse(response.body)
-            sorted_issues = issues.sort_by do |issue|
-                if state == 'closed'
-                    issue['closed_at']
-                else
-                    issue['created_at']
-                end
+            loop do
+                response = @client.get("/issues?state=#{state}&page=#{page}")
+                issues = JSON.parse(response.body) rescue []
+
+                break if issues.empty?
+
+                all_issues.concat(issues)
+                page += 1
+            end
+
+            sorted_issues = all_issues.sort_by do |issue|
+                state == 'closed' ? issue['closed_at'] : issue['created_at']
             end.reverse
+
+            # sorted_issues = issues.sort_by do |issue|
+            #     if state == 'closed'
+            #         issue['closed_at']
+            #     else
+            #         issue['created_at']
+            #     end
+            # end.reverse
            
             sorted_issues.each do |issue|
               if issue['state'] == 'closed'
