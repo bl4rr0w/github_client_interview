@@ -37,14 +37,6 @@ module Github
             sorted_issues = all_issues.sort_by do |issue|
                 state == 'closed' ? issue['closed_at'] : issue['created_at']
             end.reverse
-
-            # sorted_issues = issues.sort_by do |issue|
-            #     if state == 'closed'
-            #         issue['closed_at']
-            #     else
-            #         issue['created_at']
-            #     end
-            # end.reverse
            
             sorted_issues.each do |issue|
               if issue['state'] == 'closed'
